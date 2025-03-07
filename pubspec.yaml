@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  package_info_plus: ^8.3.0
+  pub_semver: ^2.1.5
+
 
 dev_dependencies:
   flutter_test:
