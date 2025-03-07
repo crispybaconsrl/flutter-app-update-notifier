@@ -2,13 +2,13 @@ import 'dart:async';
 import 'package:app_update_notifier/src/logic/logic.dart';
 import 'package:flutter/material.dart';
 
-typedef UpdateWidgetCallback =
+typedef UpdateCallback =
     void Function(BuildContext context, String storeUrl);
 
-typedef ForcedUpdateWidgetCallback =
+typedef ForcedUpdateCallback =
     Future<bool?> Function(BuildContext context, String storeUrl);
 
-typedef ErrorUpdateWidgetCallback =
+typedef ErrorUpdateCallback =
     void Function(Object error, StackTrace? stackTrace);
 
 class AppUpdateWidget extends StatefulWidget {
@@ -28,9 +28,9 @@ class AppUpdateWidget extends StatefulWidget {
   final FutureOr<String?> Function() fetchMinVesion;
   final FutureOr<String?> Function() fetchMinForcedVesion;
   final String iosAppStoreId;
-  final UpdateWidgetCallback onUpdate;
-  final ForcedUpdateWidgetCallback onForcedUpdate;
-  final ErrorUpdateWidgetCallback? onException;
+  final UpdateCallback onUpdate;
+  final ForcedUpdateCallback onForcedUpdate;
+  final ErrorUpdateCallback? onException;
   final Widget child;
 
   @override
