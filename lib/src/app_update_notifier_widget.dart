@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:app_update_notifier/src/logic/logic.dart';
 import 'package:flutter/material.dart';
 
@@ -24,8 +25,8 @@ class AppUpdateWidget extends StatefulWidget {
   });
 
   final GlobalKey<NavigatorState> navigatorKey;
-  final FetchMinVersion fetchMinVesion;
-  final FetchMinForcedVersion fetchMinForcedVesion;
+  final FutureOr<String?> Function() fetchMinVesion;
+  final FutureOr<String?> Function() fetchMinForcedVesion;
   final String iosAppStoreId;
   final UpdateWidgetCallback onUpdate;
   final ForcedUpdateWidgetCallback onForcedUpdate;
@@ -89,8 +90,8 @@ class _AppUpdateWidgetState extends State<AppUpdateWidget>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     appUpdateClient = AppUpdateNotifierClient(
-      fetchMinVesion: widget.fetchMinVesion,
-      fetchMinForcedVesion: widget.fetchMinForcedVesion,
+      fetchMinVersion: widget.fetchMinVesion,
+      fetchMinForcedVersion: widget.fetchMinForcedVesion,
       iosAppStoreId: widget.iosAppStoreId,
     );
     _evaluateAppUpdateRequirement();

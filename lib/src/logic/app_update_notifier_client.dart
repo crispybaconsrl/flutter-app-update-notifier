@@ -7,26 +7,26 @@ import 'package:pub_semver/pub_semver.dart';
 final class AppUpdateNotifierClient {
   factory AppUpdateNotifierClient({
     required String iosAppStoreId,
-    required FetchMinVersion fetchMinVesion,
-    required FetchMinForcedVersion fetchMinForcedVesion,
+    required FutureOr<String?> Function() fetchMinVersion,
+    required FutureOr<String?> Function() fetchMinForcedVersion,
   }) {
     return _instance ??= AppUpdateNotifierClient._privateConstructor(
       iosAppStoreId,
-      fetchMinVesion,
-      fetchMinForcedVesion,
+      fetchMinVersion,
+      fetchMinForcedVersion,
     );
   }
   AppUpdateNotifierClient._privateConstructor(
     this.iosAppStoreId,
-    this.fetchMinForcedVesion,
-    this.fetchMinVesion,
+    this.fetchMinVersion,
+    this.fetchMinForcedVersion,
   );
 
   static AppUpdateNotifierClient? _instance;
 
   final String iosAppStoreId;
-  final FetchMinVersion fetchMinVesion;
-  final FetchMinForcedVersion fetchMinForcedVesion;
+  final FutureOr<String?> Function() fetchMinVersion;
+  final FutureOr<String?> Function() fetchMinForcedVersion;
 
   static const _defaultVersion = '1.0.0';
 
@@ -41,8 +41,8 @@ final class AppUpdateNotifierClient {
       );
     }
 
-    final minForcedVersion = await fetchMinVesion.call();
-    final minVersion = await fetchMinForcedVesion.call();
+    final minForcedVersion = await fetchMinForcedVersion.call();
+    final minVersion = await fetchMinVersion.call();
 
     if (minForcedVersion == null ||
         minForcedVersion.isEmpty ||
