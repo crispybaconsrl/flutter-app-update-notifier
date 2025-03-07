@@ -1,0 +1,16 @@
+name: app_update_notifier
+description: "A Flutter package that alerts users when app updates are available, supporting both optional and mandatory update prompts."
+version: 0.0.1
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0
