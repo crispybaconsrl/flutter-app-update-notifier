@@ -15,7 +15,7 @@ class _AppState extends State<App> {
   Future<String> fetchMinForcedVesion() async =>
       Future.delayed(const Duration(seconds: 1), () => '1.0.0');
 
-  Future<String> fetchMinVesion() async =>
+  Future<String> fetchMinVersion() async =>
       Future.delayed(const Duration(seconds: 1), () => '1.0.1');
 
   @override
@@ -29,7 +29,7 @@ class _AppState extends State<App> {
       return AppUpdateWidget(
         navigatorKey: navigatorKey,
         iosAppStoreId: '284882215',
-        fetchMinVesion: () async => fetchMinVesion(),
+        fetchMinVesion: () async => fetchMinVersion(),
         fetchMinForcedVesion: () async => fetchMinForcedVesion(),
         onUpdate: (context, storeUrl) async {
           await showAdaptiveDialog<void>(
