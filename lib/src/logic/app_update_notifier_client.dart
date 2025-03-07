@@ -32,9 +32,15 @@ final class AppUpdateNotifierClient {
 
   final _appUpdateNotifierState = const AppUpdateNotifierState.initial();
 
+  bool _isSupportedPlatform() {
+    return defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.windows;
+  }
+
   Future<AppUpdateNotifierState> isAppUpdateRequired() async {
-    if (defaultTargetPlatform != TargetPlatform.iOS &&
-        defaultTargetPlatform != TargetPlatform.android) {
+    if (!_isSupportedPlatform()) {
       return _appUpdateNotifierState.copyWith(
         needUpdate: false,
         needForcedUpdate: false,
@@ -86,17 +92,20 @@ final class AppUpdateNotifierClient {
   }
 
   Future<String?> storeUrl() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    return switch (defaultTargetPlatform) {
-      TargetPlatform.android =>
-        'https://play.google.com/store/apps/details?id=${packageInfo.packageName}',
-      TargetPlatform.iOS || TargetPlatform.macOS =>
-        iosAppStoreId.isNotEmpty
-            ? 'https://apps.apple.com/app/id$iosAppStoreId'
-            : null,
-      TargetPlatform.windows =>
-        'https://www.microsoft.com/store/apps/${packageInfo.packageName}',
-      _ => throw UnsupportedError('Unsupported platform'),
-    };
+    if (_isSupportedPlatform()) {
+      final packageInfo = await PackageInfo.fromPlatform();
+      return switch (defaultTargetPlatform) {
+        TargetPlatform.android =>
+          'https://play.google.com/store/apps/details?id=${packageInfo.packageName}',
+        TargetPlatform.iOS || TargetPlatform.macOS =>
+          iosAppStoreId.isNotEmpty
+              ? 'https://apps.apple.com/app/id$iosAppStoreId'
+              : null,
+        TargetPlatform.windows =>
+          'https://www.microsoft.com/store/apps/${packageInfo.packageName}',
+        _ => null,
+      };
+    }
+    throw UnsupportedError('Unsupported platform');
   }
 }
