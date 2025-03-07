@@ -1,4 +1,4 @@
-import 'package:app_update_notifier/app_update_notifier.dart';
+import 'package:flutter_app_update_notifier/app_update_notifier.dart';
 import 'package:example/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +12,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   final navigatorKey = GlobalKey<NavigatorState>();
 
-  Future<String> fetchMinForcedVesion() async =>
+  Future<String> fetchMinForcedVersion() async =>
       Future.delayed(const Duration(seconds: 1), () => '1.0.0');
 
   Future<String> fetchMinVersion() async =>
@@ -30,7 +30,7 @@ class _AppState extends State<App> {
         navigatorKey: navigatorKey,
         iosAppStoreId: '284882215',
         fetchMinVesion: () async => fetchMinVersion(),
-        fetchMinForcedVesion: () async => fetchMinForcedVesion(),
+        fetchMinForcedVesion: () async => fetchMinForcedVersion(),
         onUpdate: (context, storeUrl) async {
           await showAdaptiveDialog<void>(
             context: context,

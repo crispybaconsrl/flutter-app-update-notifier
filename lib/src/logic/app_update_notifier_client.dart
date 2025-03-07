@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:app_update_notifier/src/logic/logic.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_app_update_notifier/src/logic/logic.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pub_semver/pub_semver.dart';
 

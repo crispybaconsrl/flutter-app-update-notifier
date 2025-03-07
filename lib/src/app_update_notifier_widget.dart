@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:app_update_notifier/src/logic/logic.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_update_notifier/src/logic/logic.dart';
 
-typedef UpdateCallback =
-    void Function(BuildContext context, String storeUrl);
+typedef UpdateCallback = void Function(BuildContext context, String storeUrl);
 
 typedef ForcedUpdateCallback =
     Future<bool?> Function(BuildContext context, String storeUrl);

@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  app_update_notifier:
+  flutter_app_update_notifier:
     path: ../
 
   # The following adds the Cupertino Icons font to your application.

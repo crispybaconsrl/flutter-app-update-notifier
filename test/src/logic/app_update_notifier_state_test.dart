@@ -1,4 +1,4 @@
-import 'package:app_update_notifier/src/logic/app_update_notifier_state.dart';
+import 'package:flutter_app_update_notifier/src/logic/app_update_notifier_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
