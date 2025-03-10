@@ -20,6 +20,7 @@ class AppUpdateWidget extends StatefulWidget {
     required this.onForcedUpdate,
     required this.onException,
     required this.child,
+    this.optionalUpdateTriggerCount = 0,
     super.key,
   });
 
@@ -27,6 +28,7 @@ class AppUpdateWidget extends StatefulWidget {
   final FutureOr<String?> Function() fetchMinVesion;
   final FutureOr<String?> Function() fetchMinForcedVesion;
   final String iosAppStoreId;
+  final int optionalUpdateTriggerCount;
   final UpdateCallback onUpdate;
   final ForcedUpdateCallback onForcedUpdate;
   final ErrorUpdateCallback? onException;
@@ -92,6 +94,7 @@ class _AppUpdateWidgetState extends State<AppUpdateWidget>
       fetchMinVersion: widget.fetchMinVesion,
       fetchMinForcedVersion: widget.fetchMinForcedVesion,
       iosAppStoreId: widget.iosAppStoreId,
+      optionalUpdateTriggerCount: widget.optionalUpdateTriggerCount,
     );
     _evaluateAppUpdateRequirement();
   }
