@@ -1,6 +1,6 @@
 name: flutter_app_update_notifier
 description: "A Flutter package that alerts users when app updates are available, supporting both optional and mandatory update prompts."
-version: 1.0.0
+version: 1.1.0
 repository: https://github.com/geraldcrispy/app-update-notifier
 homepage: hhttps://github.com/geraldcrispy/app-update-notifier
 topics: [flutter, app-updates, mandatory, optional]
