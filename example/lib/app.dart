@@ -16,7 +16,7 @@ class _AppState extends State<App> {
       Future.delayed(const Duration(seconds: 1), () => '1.0.0');
 
   Future<String> fetchMinVersion() async =>
-      Future.delayed(const Duration(seconds: 1), () => '1.0.1');
+      Future.delayed(const Duration(seconds: 1), () => '1.0.2');
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -29,6 +29,7 @@ class _AppState extends State<App> {
       return AppUpdateWidget(
         navigatorKey: navigatorKey,
         iosAppStoreId: '284882215',
+        optionalUpdateTriggerCount: 2,
         fetchMinVesion: () async => fetchMinVersion(),
         fetchMinForcedVesion: () async => fetchMinForcedVersion(),
         onUpdate: (context, storeUrl) async {
