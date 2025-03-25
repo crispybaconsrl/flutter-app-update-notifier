@@ -94,6 +94,13 @@ final class AppUpdateNotifierClient {
         ) ??
         0;
 
+    if (currentVersion <= minVersion && optionalUpdateTriggerShown > 0) {
+      await _sharedPreferencesAsync.setInt(
+        _optionalUpdateTriggerShownCountKey,
+        0,
+      );
+    }
+
     final shouldShowOptionalUpdate = (optionalUpdateTriggerShown == 0 ||
             optionalUpdateTriggerShown < optionalUpdateTriggerCount) &&
         currentVersion < minVersion;
@@ -107,7 +114,6 @@ final class AppUpdateNotifierClient {
             )
             .ignore();
       }
-
       return _appUpdateNotifierState.copyWith(
         needUpdate: true,
         needForcedUpdate: false,
