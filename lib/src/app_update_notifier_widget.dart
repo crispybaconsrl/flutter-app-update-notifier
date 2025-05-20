@@ -14,6 +14,10 @@ typedef ErrorUpdateCallback = void Function(
   StackTrace? stackTrace,
 );
 
+typedef FetchMinVersionCallback = FutureOr<String?> Function();
+
+typedef FetchMinForcedVersionCallback = FutureOr<String?> Function();
+
 class AppUpdateWidget extends StatefulWidget {
   const AppUpdateWidget({
     required this.navigatorKey,
@@ -29,8 +33,8 @@ class AppUpdateWidget extends StatefulWidget {
   });
 
   final GlobalKey<NavigatorState> navigatorKey;
-  final FutureOr<String?> Function() fetchMinVesion;
-  final FutureOr<String?> Function() fetchMinForcedVesion;
+  final FetchMinVersionCallback fetchMinVesion;
+  final FetchMinForcedVersionCallback fetchMinForcedVesion;
   final String iosAppStoreId;
   final int optionalUpdateTriggerCount;
   final UpdateCallback onUpdate;
