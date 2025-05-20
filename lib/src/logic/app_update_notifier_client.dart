@@ -41,7 +41,7 @@ final class AppUpdateNotifierClient {
   static const _defaultVersion = '1.0.0';
   static const _optionalUpdateTriggerShownCountKey =
       'optional_update_trigger_shown_count_key';
-  static final _semverPattern = RegExp(r'^\d+\.\d+\.\d+');
+  static final _semanicVersionPattern = RegExp(r'^\d+\.\d+\.\d+');
 
   final _appUpdateNotifierState = const AppUpdateNotifierState.initial();
   final _sharedPreferencesAsync = SharedPreferencesAsync();
@@ -59,7 +59,7 @@ final class AppUpdateNotifierClient {
   }
 
   String _extractSemverString(String versionString) {
-    return _semverPattern.matchAsPrefix(versionString)?.group(0) ??
+    return _semanicVersionPattern.matchAsPrefix(versionString)?.group(0) ??
         _defaultVersion;
   }
 
