@@ -33,7 +33,6 @@ final class AppUpdateNotifierClient {
   );
 
   static AppUpdateNotifierClient? _instance;
-
   final String iosAppStoreId;
   final int optionalUpdateTriggerCount;
   final FetchMinVersionCallback fetchMinVersion;
@@ -53,6 +52,17 @@ final class AppUpdateNotifierClient {
       defaultTargetPlatform == TargetPlatform.macOS ||
       defaultTargetPlatform == TargetPlatform.windows;
 
+  Future<Version> _getCurrentAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentVersionStr = _extractSemverString(packageInfo.version);
+    return Version.parse(currentVersionStr);
+  }
+
+  String _extractSemverString(String versionString) {
+    return _semverPattern.matchAsPrefix(versionString)?.group(0) ??
+        _defaultVersion;
+  }
+
   Future<AppUpdateNotifierState> isAppUpdateRequired() async {
     if (!_isSupportedPlatform()) {
       return _appUpdateNotifierState.copyWith(
@@ -64,24 +74,16 @@ final class AppUpdateNotifierClient {
     final minForcedVersionStr = await fetchMinForcedVersion.call();
     final minVersionStr = await fetchMinVersion.call();
 
-    if (minForcedVersionStr == null ||
-        minForcedVersionStr.isEmpty ||
-        minVersionStr == null ||
-        minVersionStr.isEmpty) {
+    if (_isVersionInfoMissing(minForcedVersionStr, minVersionStr)) {
       return _appUpdateNotifierState.copyWith(
         needUpdate: false,
         needForcedUpdate: false,
       );
     }
 
-    final packageInfo = await PackageInfo.fromPlatform();
-    final currentVersionStr =
-        _semverPattern.matchAsPrefix(packageInfo.version)?.group(0) ??
-            _defaultVersion;
-
-    final currentVersion = Version.parse(currentVersionStr);
-    final minForcedVersion = Version.parse(minForcedVersionStr);
-    final minVersion = Version.parse(minVersionStr);
+    final currentVersion = await _getCurrentAppVersion();
+    final minForcedVersion = Version.parse(minForcedVersionStr!);
+    final minVersion = Version.parse(minVersionStr!);
 
     if (currentVersion < minForcedVersion) {
       return _appUpdateNotifierState.copyWith(
@@ -90,6 +92,23 @@ final class AppUpdateNotifierClient {
       );
     }
 
+    return _handleOptionalUpdate(currentVersion, minVersion);
+  }
+
+  bool _isVersionInfoMissing(
+    String? minForcedVersionStr,
+    String? minVersionStr,
+  ) {
+    return minForcedVersionStr == null ||
+        minForcedVersionStr.isEmpty ||
+        minVersionStr == null ||
+        minVersionStr.isEmpty;
+  }
+
+  Future<AppUpdateNotifierState> _handleOptionalUpdate(
+    Version currentVersion,
+    Version minVersion,
+  ) async {
     final optionalUpdateTriggerShown = await _sharedPreferencesAsync.getInt(
           _optionalUpdateTriggerShownCountKey,
         ) ??
@@ -102,19 +121,14 @@ final class AppUpdateNotifierClient {
       );
     }
 
-    final shouldShowOptionalUpdate = (optionalUpdateTriggerShown == 0 ||
-            optionalUpdateTriggerShown < optionalUpdateTriggerCount) &&
-        currentVersion < minVersion;
+    final shouldShowOptionalUpdate = _shouldShowOptionalUpdateNotification(
+      currentVersion,
+      minVersion,
+      optionalUpdateTriggerShown,
+    );
 
     if (shouldShowOptionalUpdate) {
-      if (optionalUpdateTriggerCount > 0) {
-        _sharedPreferencesAsync
-            .setInt(
-              _optionalUpdateTriggerShownCountKey,
-              optionalUpdateTriggerShown + 1,
-            )
-            .ignore();
-      }
+      await _incrementOptionalUpdateCounter(optionalUpdateTriggerShown);
       return _appUpdateNotifierState.copyWith(
         needUpdate: true,
         needForcedUpdate: false,
@@ -125,6 +139,27 @@ final class AppUpdateNotifierClient {
       needUpdate: false,
       needForcedUpdate: false,
     );
+  }
+
+  bool _shouldShowOptionalUpdateNotification(
+    Version currentVersion,
+    Version minVersion,
+    int shownCount,
+  ) {
+    final belowCountLimit =
+        shownCount == 0 || shownCount < optionalUpdateTriggerCount;
+    return belowCountLimit && currentVersion < minVersion;
+  }
+
+  Future<void> _incrementOptionalUpdateCounter(int currentCount) async {
+    if (optionalUpdateTriggerCount > 0) {
+      _sharedPreferencesAsync
+          .setInt(
+            _optionalUpdateTriggerShownCountKey,
+            currentCount + 1,
+          )
+          .ignore();
+    }
   }
 
   Future<String?> storeUrl() async {
