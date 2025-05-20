@@ -4,11 +4,15 @@ import 'package:flutter_app_update_notifier/src/logic/logic.dart';
 
 typedef UpdateCallback = void Function(BuildContext context, String storeUrl);
 
-typedef ForcedUpdateCallback =
-    Future<bool?> Function(BuildContext context, String storeUrl);
+typedef ForcedUpdateCallback = Future<bool?> Function(
+  BuildContext context,
+  String storeUrl,
+);
 
-typedef ErrorUpdateCallback =
-    void Function(Object error, StackTrace? stackTrace);
+typedef ErrorUpdateCallback = void Function(
+  Object error,
+  StackTrace? stackTrace,
+);
 
 class AppUpdateWidget extends StatefulWidget {
   const AppUpdateWidget({
@@ -40,63 +44,16 @@ class AppUpdateWidget extends StatefulWidget {
 
 class _AppUpdateWidgetState extends State<AppUpdateWidget>
     with WidgetsBindingObserver {
-  bool isAlertVisible = false;
+  bool _isAlertVisible = false;
 
-  late final AppUpdateNotifierClient appUpdateClient;
-
-  Future<void> _evaluateAppUpdateRequirement() async {
-    if (isAlertVisible) {
-      return;
-    }
-    final updateState = await appUpdateClient.isAppUpdateRequired();
-    if (updateState.needForcedUpdate && updateState.needUpdate) {
-      return;
-    }
-    try {
-      final storeUrl = await appUpdateClient.storeUrl();
-      if (storeUrl == null) {
-        return;
-      }
-      final ctx = widget.navigatorKey.currentContext ?? context;
-
-      if (updateState.needUpdate && ctx.mounted) {
-        widget.onUpdate.call(ctx, storeUrl);
-      } else if (updateState.needForcedUpdate && ctx.mounted) {
-        await _initiateForcedUpdate(storeUrl);
-      }
-    } on Object catch (e, st) {
-      final handler = widget.onException;
-      if (handler != null) {
-        handler.call(e, st);
-      } else {
-        rethrow;
-      }
-    }
-  }
-
-  Future<void> _initiateForcedUpdate(String storeUrl) async {
-    final ctx = widget.navigatorKey.currentContext ?? context;
-
-    isAlertVisible = true;
-    final success = await widget.onForcedUpdate(ctx, storeUrl);
-
-    isAlertVisible = false;
-    if (success == null) {
-      return _initiateForcedUpdate(storeUrl);
-    }
-  }
+  late final AppUpdateNotifierClient _appUpdateClient;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    appUpdateClient = AppUpdateNotifierClient(
-      fetchMinVersion: widget.fetchMinVesion,
-      fetchMinForcedVersion: widget.fetchMinForcedVesion,
-      iosAppStoreId: widget.iosAppStoreId,
-      optionalUpdateTriggerCount: widget.optionalUpdateTriggerCount,
-    );
-    _evaluateAppUpdateRequirement();
+    _initializeUpdateClient();
+    _checkForUpdates();
   }
 
   @override
@@ -105,10 +62,69 @@ class _AppUpdateWidgetState extends State<AppUpdateWidget>
     super.dispose();
   }
 
+  void _initializeUpdateClient() {
+    _appUpdateClient = AppUpdateNotifierClient(
+      fetchMinVersion: widget.fetchMinVesion,
+      fetchMinForcedVersion: widget.fetchMinForcedVesion,
+      iosAppStoreId: widget.iosAppStoreId,
+      optionalUpdateTriggerCount: widget.optionalUpdateTriggerCount,
+    );
+  }
+
+  Future<void> _checkForUpdates() async {
+    try {
+      await _evaluateAppUpdateRequirement();
+    } on Object catch (e, st) {
+      _handleUpdateError(e, st);
+    }
+  }
+
+  Future<void> _evaluateAppUpdateRequirement() async {
+    if (_isAlertVisible) return;
+
+    final updateState = await _appUpdateClient.isAppUpdateRequired();
+
+    if (updateState.needForcedUpdate && updateState.needUpdate) return;
+
+    final storeUrl = await _appUpdateClient.storeUrl();
+    if (storeUrl == null) return;
+
+    final ctx = widget.navigatorKey.currentContext ?? context;
+    if (!ctx.mounted) return;
+
+    if (updateState.needUpdate) {
+      widget.onUpdate(ctx, storeUrl);
+    } else if (updateState.needForcedUpdate) {
+      await _showForcedUpdateDialog(storeUrl);
+    }
+  }
+
+  Future<void> _showForcedUpdateDialog(String storeUrl) async {
+    final ctx = widget.navigatorKey.currentContext ?? context;
+    if (!ctx.mounted) return;
+
+    _isAlertVisible = true;
+    final userResponse = await widget.onForcedUpdate(ctx, storeUrl);
+    _isAlertVisible = false;
+
+    if (userResponse == null) {
+      await _showForcedUpdateDialog(storeUrl);
+    }
+  }
+
+  void _handleUpdateError(Object error, StackTrace stackTrace) {
+    final errorHandler = widget.onException;
+    if (errorHandler != null) {
+      errorHandler(error, stackTrace);
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _evaluateAppUpdateRequirement();
+      unawaited(
+        _checkForUpdates(),
+      );
     }
   }
 
