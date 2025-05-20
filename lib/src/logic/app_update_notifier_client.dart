@@ -41,16 +41,16 @@ final class AppUpdateNotifierClient {
   static const _defaultVersion = '1.0.0';
   static const _optionalUpdateTriggerShownCountKey =
       'optional_update_trigger_shown_count_key';
+  static final _semverPattern = RegExp(r'^\d+\.\d+\.\d+');
 
   final _appUpdateNotifierState = const AppUpdateNotifierState.initial();
   final _sharedPreferencesAsync = SharedPreferencesAsync();
 
-  bool _isSupportedPlatform() {
-    return defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.android ||
-        defaultTargetPlatform == TargetPlatform.macOS ||
-        defaultTargetPlatform == TargetPlatform.windows;
-  }
+  bool _isSupportedPlatform() =>
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.macOS ||
+      defaultTargetPlatform == TargetPlatform.windows;
 
   Future<AppUpdateNotifierState> isAppUpdateRequired() async {
     if (!_isSupportedPlatform()) {
@@ -75,7 +75,7 @@ final class AppUpdateNotifierClient {
 
     final packageInfo = await PackageInfo.fromPlatform();
     final currentVersionStr =
-        RegExp(r'\d+\.\d+\.\d+').matchAsPrefix(packageInfo.version)?.group(0) ??
+        _semverPattern.matchAsPrefix(packageInfo.version)?.group(0) ??
             _defaultVersion;
 
     final currentVersion = Version.parse(currentVersionStr);
