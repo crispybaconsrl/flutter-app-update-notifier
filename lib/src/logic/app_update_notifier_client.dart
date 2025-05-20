@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_app_update_notifier/src/logic/logic.dart';
+import 'package:flutter_app_update_notifier/src/utils/callbacks.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,8 +10,8 @@ final class AppUpdateNotifierClient {
   factory AppUpdateNotifierClient({
     required String iosAppStoreId,
     required int optionalUpdateTriggerCount,
-    required FutureOr<String?> Function() fetchMinVersion,
-    required FutureOr<String?> Function() fetchMinForcedVersion,
+    required FetchMinVersionCallback fetchMinVersion,
+    required FetchMinForcedVersionCallback fetchMinForcedVersion,
   }) {
     assert(
       optionalUpdateTriggerCount >= 0,
@@ -35,8 +36,8 @@ final class AppUpdateNotifierClient {
 
   final String iosAppStoreId;
   final int optionalUpdateTriggerCount;
-  final FutureOr<String?> Function() fetchMinVersion;
-  final FutureOr<String?> Function() fetchMinForcedVersion;
+  final FetchMinVersionCallback fetchMinVersion;
+  final FetchMinForcedVersionCallback fetchMinForcedVersion;
 
   static const _defaultVersion = '1.0.0';
   static const _optionalUpdateTriggerShownCountKey =

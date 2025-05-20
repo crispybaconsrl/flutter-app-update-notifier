@@ -1,22 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_update_notifier/src/logic/logic.dart';
-
-typedef UpdateCallback = void Function(BuildContext context, String storeUrl);
-
-typedef ForcedUpdateCallback = Future<bool?> Function(
-  BuildContext context,
-  String storeUrl,
-);
-
-typedef ErrorUpdateCallback = void Function(
-  Object error,
-  StackTrace? stackTrace,
-);
-
-typedef FetchMinVersionCallback = FutureOr<String?> Function();
-
-typedef FetchMinForcedVersionCallback = FutureOr<String?> Function();
+import 'package:flutter_app_update_notifier/src/utils/callbacks.dart';
 
 class AppUpdateWidget extends StatefulWidget {
   const AppUpdateWidget({
